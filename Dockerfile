@@ -2,11 +2,11 @@
 FROM node:22-alpine AS build
 WORKDIR /app/fitness-tracker-app
 
-COPY package*.json ./
+COPY fitness-tracker-app/package*.json ./
 
 RUN npm ci --no-audit --no-fund
 
-COPY . .
+COPY fitness-tracker-app/. ./
 # Build (works for CRA or Vite depending on your project)
 RUN npm run build
 
@@ -18,10 +18,10 @@ ARG BUILD_DIR=build
 ENV BUILD_DIR=${BUILD_DIR}
 
 # Copy the build output from the builder
-COPY --from=build /app/fitness-tracker-app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Optional SPA routing (uncomment if you use React Router)
-# COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
