@@ -1,12 +1,44 @@
 version: "3.9"
+
 services:
-  react:
+  frontend:
+    container_name: fitness-tracker-frontend
     build:
       context: .
       dockerfile: Dockerfile
-      # If you use Vite, uncomment this:
-      # args:
-      #   BUILD_DIR: dist
     ports:
       - "80:80"
     restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - fitness-network
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_BASE_URL=/api
+
+  backend:
+    container_name: fitness-tracker-backend
+    build:
+      context: ../GroupCICD_FitnessTracker_backend  # Adjust this path to your backend directory
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - DEBUG=0
+      - SECRET_KEY=django-insecure-^l482n+=kenr%!cpvqsfzyv_0igm(w*&$oq%i+%@oxwy2jh_j(
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1] backend
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    networks:
+      - fitness-network
+
+networks:
+  fitness-network:
+    driver: bridge
+
+volumes:
+  static_volume:
+  media_volume:
